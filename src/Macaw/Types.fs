@@ -6,32 +6,14 @@ open Microsoft.AspNetCore.Http.Authentication
 open System.Security.Claims
 open System.Collections
 open System.Threading.Tasks
+open Microsoft.AspNetCore.Routing
 
-type Conn = {
-    Request : HttpRequest
-    Response : HttpResponse
-    Authentication : AuthenticationManager
-    Session : ISession
-    WebSockets : WebSocketManager
-    User : ClaimsPrincipal
-}
+type MacawDI<'Dependency, 'Result> = 'Dependency -> 'Result
 
-type Params = IDictionary
-type Controller = Conn -> Params -> Conn
-type AsyncController = Conn -> Params -> Async<Conn>
+let lift (f : 'T -> 'Dependency -> 'Result) (a : 'T) : MacawDI<'Dependency, 'Result> =
+  f a
 
-type Microsoft.FSharp.Control.AsyncBuilder with
-    member x.Bind(t : Task<'T>, f : 'T -> Async<'R>) : Async<'R> =
-        async.Bind(Async.AwaitTask t, f)
+let lift2 (f : 'T -> 'U -> 'Dependency -> 'Result) (a : 'T) (b : 'U) : MacawDI<'Dependency, 'Result> =
+  f a b
 
-    member x.Bind(t : Task, f : 'T -> Async<'R>) : Async<'R> = 
-        async.Bind(Async.AwaitTask t, f)
-
-let httpContextToConn (ctx : HttpContext) : Conn = {
-    Request = ctx.Request
-    Response = ctx.Response
-    Authentication = ctx.Authentication
-    Session = ctx.Session
-    WebSockets = ctx.WebSockets
-    User = ctx.User
-}
+type Controller = HttpContext -> RouteValueDictionary -> Async<HttpContext>

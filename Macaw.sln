@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{36970AC9-EC7
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Macaw", "src\Macaw\Macaw.fsproj", "{73813C2D-DE77-4617-A467-3949A6775B79}"
 EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Macaw.Test", "src\Macaw.Test\Macaw.Test.fsproj", "{EF93E381-DB48-4D2F-ADF1-86D62F15A581}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,8 +34,21 @@ Global
 		{73813C2D-DE77-4617-A467-3949A6775B79}.Release|x64.Build.0 = Release|x64
 		{73813C2D-DE77-4617-A467-3949A6775B79}.Release|x86.ActiveCfg = Release|x86
 		{73813C2D-DE77-4617-A467-3949A6775B79}.Release|x86.Build.0 = Release|x86
+		{EF93E381-DB48-4D2F-ADF1-86D62F15A581}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF93E381-DB48-4D2F-ADF1-86D62F15A581}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF93E381-DB48-4D2F-ADF1-86D62F15A581}.Debug|x64.ActiveCfg = Debug|x64
+		{EF93E381-DB48-4D2F-ADF1-86D62F15A581}.Debug|x64.Build.0 = Debug|x64
+		{EF93E381-DB48-4D2F-ADF1-86D62F15A581}.Debug|x86.ActiveCfg = Debug|x86
+		{EF93E381-DB48-4D2F-ADF1-86D62F15A581}.Debug|x86.Build.0 = Debug|x86
+		{EF93E381-DB48-4D2F-ADF1-86D62F15A581}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF93E381-DB48-4D2F-ADF1-86D62F15A581}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF93E381-DB48-4D2F-ADF1-86D62F15A581}.Release|x64.ActiveCfg = Release|x64
+		{EF93E381-DB48-4D2F-ADF1-86D62F15A581}.Release|x64.Build.0 = Release|x64
+		{EF93E381-DB48-4D2F-ADF1-86D62F15A581}.Release|x86.ActiveCfg = Release|x86
+		{EF93E381-DB48-4D2F-ADF1-86D62F15A581}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{73813C2D-DE77-4617-A467-3949A6775B79} = {36970AC9-EC75-4E64-B1AE-48737E022DE3}
+		{EF93E381-DB48-4D2F-ADF1-86D62F15A581} = {36970AC9-EC75-4E64-B1AE-48737E022DE3}
 	EndGlobalSection
 EndGlobal

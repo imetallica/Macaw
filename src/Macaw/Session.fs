@@ -6,26 +6,26 @@ open Newtonsoft.Json
 open Microsoft.AspNetCore.Session
 open Microsoft.AspNetCore.Http
         
-let getSessionValue<'T> (key : string) (conn : Conn) = async {
-    do! conn.Session.LoadAsync() // Always call load async
+let getSessionValue<'T> (key : string) (ctx : HttpContext) = async {
+    do! ctx.Session.LoadAsync() |> Async.AwaitTask // Always call load async
     
-    match conn.Session.TryGetValue(key) with
+    match ctx.Session.TryGetValue(key) with
     | (true, v) -> 
         if v.Length > 0 then
-            let converted = Encoding.Unicode.GetString(v)
+            let converted = Encoding.UTF8.GetString(v)
             return Some (JsonConvert.DeserializeObject<'T>(converted))
         else 
             return None
     | _ -> return None
 }
 
-let setSessionValue (key : string) (value : 'T) (conn : Conn) = async {
-    do! conn.Session.LoadAsync() // Always call load async
+let setSessionValue (key : string) (value : 'T) (ctx : HttpContext) = async {
+    do! ctx.Session.LoadAsync() |> Async.AwaitTask // Always call load async
 
-    let converted = Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(value))
-    conn.Session.Set(key, converted)
+    let converted = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value))
+    ctx.Session.Set(key, converted)
 
-    return conn
+    return ctx
 }
 
 
@@ -34,51 +34,50 @@ let setSessionValue (key : string) (value : 'T) (conn : Conn) = async {
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
 
+type MacawSessionOptions = {
+    CookieDomain : string
+    CookieHttpOnly : bool
+    CookieName : string
+    CookiePath : string
+    CookieSecure : CookieSecurePolicy
+    IdleTimeout : TimeSpan
+}
 
-module AppConfigurer =
-    let useSession (app : IApplicationBuilder) = 
-        app.UseSession()
+type MacawMemoryCacheOptions = {
+    ExpirationScanFrequency : TimeSpan
+    CompactOnMemoryPressure : bool
+}
 
-module ServiceConfigurer = 
-    type SessionOptions = {
-        CookieDomain : string
-        CookieHttpOnly : bool
-        CookieName : string
-        CookiePath : string
-        CookieSecure : CookieSecurePolicy
-        IdleTimeout : TimeSpan
-    }
+let defaultMacawSessionOptions = {
+    CookieDomain = ""
+    CookieHttpOnly = true
+    CookieName = ""
+    CookiePath = ""
+    CookieSecure = CookieSecurePolicy.SameAsRequest
+    IdleTimeout = TimeSpan.FromMinutes(60.)
+}
 
-    type MemoryCacheOptions = {
-        ExpirationScanFrequency : TimeSpan
-        CompactOnMemoryPressure : bool
-    }
+let defaultMacawMemoryCacheOptions = {
+    ExpirationScanFrequency = TimeSpan.FromMinutes(60.)
+    CompactOnMemoryPressure = false
+}
 
-    let defaultSessionOptions = {
-        CookieDomain = ""
-        CookieHttpOnly = true
-        CookieName = ""
-        CookiePath = ""
-        CookieSecure = CookieSecurePolicy.SameAsRequest
-        IdleTimeout = TimeSpan.FromMinutes(60.)
-    }
+type IApplicationBuilder with
+    member this.UseMacawSession() = 
+        this.UseSession()
 
-    let defaultMemoryCacheOptions = {
-        ExpirationScanFrequency = TimeSpan.FromMinutes(60.)
-        CompactOnMemoryPressure = false
-    }
+type IServiceCollection with
+    member this.AddMacawDistributedMemoryCache () = 
+        this.AddDistributedMemoryCache()
 
-    let addDistributedMemoryCache (services : IServiceCollection) = 
-        services.AddDistributedMemoryCache()
-
-    let addMemoryCache (opts : MemoryCacheOptions) (services : IServiceCollection) = 
-        services.AddMemoryCache(fun o -> 
+    member this.AddMacawMemoryCache (opts : MacawMemoryCacheOptions) =
+        this.AddMemoryCache(fun o -> 
             o.ExpirationScanFrequency <- opts.ExpirationScanFrequency
             o.CompactOnMemoryPressure <- opts.CompactOnMemoryPressure
         )
 
-    let addSession (opts : SessionOptions) (services : IServiceCollection) =
-        services.AddSession(fun o -> 
+    member this.AddMacawSession (opts : MacawSessionOptions) =
+        this.AddSession(fun o ->
             o.CookieDomain <- opts.CookieDomain
             o.CookieHttpOnly <- opts.CookieHttpOnly
             o.CookieName <- opts.CookieName

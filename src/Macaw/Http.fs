@@ -1,10 +1,11 @@
 module Macaw.Http
 
+open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Primitives
 open Newtonsoft.Json
 
 /// Taken from https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
-type HTTP_STATUS_CODE = 
+type HttpStatusCode = 
     | CONTINUE = 100
     | SWITCHING_PROTOCOLS = 101
     | PROCESSING = 102
@@ -83,30 +84,30 @@ let private stringValuesToOptionalHttpHeaderValue (v : StringValues) =
     | _ -> None
 
 /// Get an optional value from a request header.
-let getRequestHeader (key : string) (conn : Conn) = 
-    match conn.Request.Headers.TryGetValue(key) with
+let getRequestHeader (key : string) (ctx : HttpContext) = 
+    match ctx.Request.Headers.TryGetValue(key) with
     | (true, v) -> stringValuesToOptionalHttpHeaderValue v
     | _ -> None
 
 /// Get an optional value from a response header.
-let getResponseHeader (key : string) (conn : Conn) = 
-    match conn.Response.Headers.TryGetValue(key) with
+let getResponseHeader (key : string) (ctx : HttpContext) = 
+    match ctx.Response.Headers.TryGetValue(key) with
     | (true, v) -> stringValuesToOptionalHttpHeaderValue v
     | _ -> None
 
-let setRequestHeader (key : string) (value : HttpHeaderValue) (conn : Conn) = 
+let setRequestHeader (key : string) (value : HttpHeaderValue) (ctx : HttpContext) = 
     match value with
-    | MultiString s -> do conn.Request.Headers.Add(key, StringValues(s))
-    | SingleString s -> do conn.Request.Headers.Add(key, StringValues(s))
-    conn
+    | MultiString s -> do ctx.Request.Headers.Add(key, StringValues(s))
+    | SingleString s -> do ctx.Request.Headers.Add(key, StringValues(s))
+    ctx
 
-let setResponseHeader (key : string) (value : HttpHeaderValue) (conn : Conn) = 
+let setResponseHeader (key : string) (value : HttpHeaderValue) (ctx : HttpContext) = 
     match value with
-    | MultiString s -> do conn.Response.Headers.Add(key, StringValues(s))
-    | SingleString s -> do conn.Response.Headers.Add(key, StringValues(s))
-    conn
+    | MultiString s -> do ctx.Response.Headers.Add(key, StringValues(s))
+    | SingleString s -> do ctx.Response.Headers.Add(key, StringValues(s))
+    ctx
 
-let putStatus (status : int) (conn : Conn) = 
-    do conn.Response.StatusCode <- status
-    conn
+let putStatus (status : int) (ctx : HttpContext) = 
+    do ctx.Response.StatusCode <- status
+    ctx
     
