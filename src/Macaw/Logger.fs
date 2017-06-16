@@ -17,8 +17,8 @@ let logHelper (logLevel : LogLevel) =
     | _ -> f.LogError "Please, select a proper LogLevel"
 
 let logDebug message = 
-  lift (logHelper LogLevel.Debug) message
-
+  liftr (logHelper LogLevel.Debug) message
+  
 type ILoggerFactory with
   member this.AddMacawConsole() =
     this.AddConsole()

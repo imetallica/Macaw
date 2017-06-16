@@ -5,6 +5,7 @@ open Macaw.Logger
 
 [<EntryPoint>]
 let main args = 
+  use f = new Microsoft.Extensions.Logging.LoggerFactory()
 
   do logDebug "Hello Mom!"
 
